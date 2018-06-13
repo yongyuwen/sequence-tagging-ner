@@ -1,0 +1,14 @@
+*sh
+
+*.pyc
+
+/data/
+/.gitkeep
+/
+/results
+/
+*.DS_Store
+
+/saves/
+/.idea/
+
