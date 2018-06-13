@@ -13,6 +13,7 @@ class NERModel(BaseModel):
 
     def __init__(self, config):
         super(NERModel, self).__init__(config)
+        self.optimizer = None
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
 

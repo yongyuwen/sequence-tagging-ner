@@ -1,19 +1,15 @@
 import numpy as np
 from keras.layers import Input, Bidirectional, LSTM, Embedding, Dense, Dropout, Lambda, Concatenate
 from keras.models import Model
-from keras.utils import to_categorical
 import keras.backend as K
-from keras_contrib.layers import crf
+from keras_contrib.layers import CRF
 
-
-from .callbacks import F1score
 from .keras_model import BaseKerasModel
-from .data_utils import minibatches, pad_sequences
 
 class BLSTMCRF(BaseKerasModel):
     def __init__(self, config):
         super(BLSTMCRF, self).__init__(config)
-        self._loss = 'categorical_crossentropy' #losses.sparse_categorical_crossentropy
+        self._loss = None #losses.sparse_categorical_crossentropy
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
 
@@ -57,53 +53,16 @@ class BLSTMCRF(BaseKerasModel):
         word_embeddings = Dropout(self.config.dropout)(word_embeddings)
         encoded_text = Bidirectional(LSTM(units=self.config.hidden_size_lstm, return_sequences=True))(word_embeddings)
         encoded_text = Dropout(self.config.dropout)(encoded_text)
-        pred = Dense(self.config.ntags, activation='softmax')(encoded_text)
+        #encoded_text = Dense(100, activation='tanh')(encoded_text)
+
+        if self.config.use_crf:
+            crf = CRF(self.config.ntags, sparse_target=False)
+            self._loss = crf.loss_function
+            pred = crf(encoded_text)
+
+        else:
+            self._loss = 'categorical_crossentropy'
+            pred = Dense(self.config.ntags, activation='softmax')(encoded_text)
 
         self.model = Model(inputs, pred)
-
-
-    # def batch_iter(self, train, batch_size, return_lengths=False):
-    #     """
-    #     Creates a batch generator for the dataset
-    #     :param train: Dataset
-    #     :param batch_size: Batch Size
-    #     :param return_lengths: If True, generator returns sequence lengths. Used masking data during the evaluation step
-    #     :return: (number of batches in dataset, data generator)
-    #     """
-    #     nbatches = (len(train) + batch_size - 1) // batch_size
-    #
-    #     def data_generator():
-    #         while True:
-    #             for i, (words, labels) in enumerate(minibatches(train, batch_size)):
-    #
-    #                 # perform padding of the given data
-    #                 if self.config.use_chars:
-    #                     char_ids, word_ids = zip(*words)
-    #                     word_ids, sequence_lengths = pad_sequences(word_ids, 0)
-    #                     char_ids, word_lengths = pad_sequences(char_ids, pad_tok=0,
-    #                     nlevels=2)
-    #
-    #                 else:
-    #                     char_ids, word_ids = zip(*words)
-    #                        word_ids, sequence_lengths = pad_sequences(word_ids, 0)
-    #
-    #                 if labels:
-    #                     labels, _ = pad_sequences(labels, 0)
-    #                     labels = [to_categorical(label, num_classes=self.config.ntags) for label in labels] # Change labels to one-hot
-    #
-    #                 # build dictionary
-    #                 inputs = {
-    #                     "word_ids": np.asarray(word_ids),
-    #                 }
-    #
-    #                 if self.config.use_chars:
-    #                     inputs["char_ids"] = np.asarray(char_ids)
-    #
-    #                 if return_lengths:
-    #                     yield(inputs, np.asarray(labels), sequence_lengths)
-    #
-    #                 else:
-    #                     yield (inputs, np.asarray(labels))
-    #
-    #     return (nbatches, data_generator())
 

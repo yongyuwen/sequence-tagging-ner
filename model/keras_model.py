@@ -3,7 +3,6 @@ from keras.layers import Input, Bidirectional, LSTM, Embedding, Dense, Dropout
 from keras.models import Model
 from keras.utils import to_categorical
 
-
 from model.callbacks import F1score
 
 from .data_utils import minibatches, pad_sequences
@@ -150,42 +149,5 @@ class Word_BLSTM(BaseKerasModel):
         self.model = Model(input_tensor, pred)
 
 
-    # def batch_iter(self, train, batch_size, return_lengths=False):
-    #     """
-    #     Creates a batch generator for the dataset
-    #     :param train: Dataset
-    #     :param batch_size: Batch Size
-    #     :param return_lengths: If True, generator returns sequence lengths. Used masking data during the evaluation step
-    #     :return: (number of batches in dataset, data generator)
-    #     """
-    #     nbatches = (len(train) + batch_size - 1) // batch_size
-    #
-    #     def data_generator():
-    #         while True:
-    #             for i, (words, labels) in enumerate(minibatches(train, batch_size)):
-    #                 labels, _ = pad_sequences(labels, 0)
-    #                 labels = [to_categorical(label, num_classes=self.config.ntags) for label in labels] # Change labels to one-hot
-    #                 char_ids, word_ids = zip(*words)
-    #                 word_ids, sequence_lengths = pad_sequences(word_ids, 0)
-    #                 if return_lengths:
-    #                     yield(np.asarray(word_ids), np.asarray(labels), sequence_lengths)
-    #                 else:
-    #                     yield (np.asarray(word_ids), np.asarray(labels))
-    #
-    #     return (nbatches, data_generator())
-
-
-
-    # def test(self, train, batch_size):
-    #     for i, (words, labels) in enumerate(minibatches(train, batch_size)):
-    #         char_ids, word_ids = zip(*words)
-    #         print(labels)
-    #         labels, _ = pad_sequences(labels, 0)
-    #         print(labels)
-    #         word_ids, sequence_lengths = pad_sequences(word_ids, 0)
-    #         labels = [to_categorical(label, num_classes=self.config.ntags) for label in labels]
-    #         print("Word ids: ", word_ids)
-    #         print(np.asarray(labels))
-    #         break
 
 
