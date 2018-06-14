@@ -2,7 +2,6 @@ import numpy as np
 import os
 import tensorflow as tf
 
-
 from .data_utils import minibatches, pad_sequences, get_chunks
 from .general_utils import Progbar
 from .base_model import BaseModel
@@ -11,9 +10,9 @@ from .base_model import BaseModel
 class NERModel(BaseModel):
     """Specialized class of Model for NER"""
 
+
     def __init__(self, config):
         super(NERModel, self).__init__(config)
-        self.optimizer = None
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
 

@@ -96,6 +96,7 @@ class Config():
     lr_method        = "adam"
     lr               = 0.001
     lr_decay         = 0.9
+    epoch_drop       = 1 # Step Decay: per # epochs to apply lr_decay
     clip             = -1 # if negative, no clipping
     nepoch_no_imprv  = 3
 

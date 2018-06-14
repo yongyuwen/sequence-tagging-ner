@@ -2,6 +2,7 @@ import numpy as np
 from keras.layers import Input, Bidirectional, LSTM, Embedding, Dense, Dropout
 from keras.models import Model
 from keras.utils import to_categorical
+from sklearn.metrics import f1_score
 
 from model.callbacks import F1score
 
@@ -78,14 +79,16 @@ class BaseKerasModel(object):
 
 
         _, f1_generator = self.batch_iter(dev, batch_size, return_lengths=True)
-        f1 = F1score(f1_generator, 2, self.config)
+        f1 = F1score(f1_generator, 2)
+
+        callbacks = self.gen_callbacks([f1])
 
         self.model.fit_generator(generator=train_generator,
                                  steps_per_epoch=2,
                                  validation_data=dev_generator,
                                  validation_steps=2,
                                  epochs=2,
-                                 callbacks=[f1]) #, nbatches_train
+                                 callbacks=callbacks) #, nbatches_train
 
     def predict_words(self, words_raw):
         words = [self.config.processing_word(w) for w in words_raw]
@@ -116,15 +119,66 @@ class BaseKerasModel(object):
         pred_ids = np.argmax(one_hot_preds, axis=1)
         print("Pred ids: ", pred_ids)
 
-        #preds = [self.idx_to_tag[idx] for idx in pred_ids]
+        preds = [self.idx_to_tag[idx] for idx in pred_ids]
 
-        #return preds
+        return preds
+
+    def run_evaluate(self, data_generator, steps_per_epoch):
+        accs = []
+        label_true = []
+        label_pred = []
+        for i in range(steps_per_epoch):
+            #try:
+            x_true, y_true, sequence_lengths = next(data_generator)
+            y_pred = self.model.predict_on_batch(x_true)
+
+            for lab, lab_pred, length in zip(y_true, y_pred,
+                                             sequence_lengths):
+                lab = lab[:length]
+                lab_pred = lab_pred[:length]
+
+                lab = np.argmax(lab, axis=1)
+                lab_pred = np.argmax(lab_pred, axis=1)
+                accs += [a==b for (a, b) in zip(lab, lab_pred)]
+
+
+                label_true.extend(lab)
+                label_pred.extend(lab_pred)
+                #break
+            #break
+            #except StopIteration:
+                #break
+
+        #print(label_true)
+        label_true = np.asarray(label_true)
+        print("Truths: ", label_true)
+        #print(label_pred)
+        label_pred = np.asarray(label_pred)
+        print("Preds: ", label_pred)
+
+        acc = np.mean(accs)
+
+        micro_score = f1_score(label_true, label_pred, average='micro')
+        print("acc: ", 100*acc)
+
+        micro_score = f1_score(label_true, label_pred, average='micro')
+        print(' - micro f1: {:04.2f}'.format(micro_score * 100))
+
+        macro_score = f1_score(label_true, label_pred, average='macro')
+        print(' - macro f1: {:04.2f}'.format(macro_score * 100))
+
+        weighted_score = f1_score(label_true, label_pred, average='weighted')
+        print(' - weighted f1: {:04.2f}'.format(weighted_score * 100))
 
     def get_loss(self):
         return self._loss
 
     def __getattr__(self, name):
         return getattr(self.model, name)
+
+    def get_optimizer(self):
+        return self._optimizer
+
 
 class Word_BLSTM(BaseKerasModel):
     """
@@ -133,6 +187,7 @@ class Word_BLSTM(BaseKerasModel):
     def __init__(self, config):
         super(Word_BLSTM, self).__init__(config)
         self._loss = 'categorical_crossentropy' #losses.sparse_categorical_crossentropy
+        self._optimizer = self.config.lr_method # adam
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
         self.config.use_chars = False
@@ -147,6 +202,9 @@ class Word_BLSTM(BaseKerasModel):
         pred = Dense(self.config.ntags, activation='softmax')(encoded_text_dropout)
 
         self.model = Model(input_tensor, pred)
+
+    def gen_callbacks(self, callbacks_list):
+        return callbacks_list
 
 
 

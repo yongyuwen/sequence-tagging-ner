@@ -6,11 +6,10 @@ import numpy as np
 
 class F1score(Callback):
 
-    def __init__(self, data_generator, steps_per_epoch, config, preprocessor=None):
+    def __init__(self, data_generator, steps_per_epoch):
         super(F1score, self).__init__()
         self.steps = steps_per_epoch
         self.data_generator = data_generator
-        self.config=config
         #self.p = preprocessor
 
     def on_epoch_end(self, epoch, logs={}):

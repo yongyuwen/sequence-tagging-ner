@@ -14,7 +14,7 @@ def main():
     model = BLSTMCRF(config) #Word_BLSTM(config)
     #model = Word_BLSTM(config)
     model.build()
-    model.compile(optimizer='adam', loss=model.get_loss()) #, metrics=['acc']
+    model.compile(optimizer=model.get_optimizer(), loss=model.get_loss()) #, metrics=['acc']
 
     #model.summary()
     # Loading weights
@@ -27,7 +27,7 @@ def main():
     train = CoNLLDataset(config.filename_train, config.processing_word,
                          config.processing_tag, config.max_iter)
 
-
+    model.summary()
     # train model
     model.train(train, dev)
 
@@ -37,8 +37,8 @@ def main():
     # test predictions
     words = "Obama was born in hawaii"
     words = words.split(" ")
-    model.predict_words(words)
-
+    pred = model.predict_words(words)
+    print(pred)
 
 if __name__ == "__main__":
     main()
