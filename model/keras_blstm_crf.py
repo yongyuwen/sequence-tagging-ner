@@ -5,7 +5,10 @@ import keras.backend as K
 from keras_contrib.layers import CRF
 from keras import optimizers
 from keras.callbacks import LearningRateScheduler
+import matplotlib.pyplot as plt
 
+
+from .callbacks import LossHistory
 from .keras_model import BaseKerasModel
 
 class BLSTMCRF(BaseKerasModel):
@@ -75,6 +78,9 @@ class BLSTMCRF(BaseKerasModel):
     def gen_callbacks(self, callbacks_list):
         lrate = LearningRateScheduler(self.step_decay)
         callbacks_list.append(lrate)
+
+        #loss_history = LossHistory(self.step_decay)
+        #callbacks_list.append(loss_history)
         return callbacks_list
 
 
@@ -86,3 +92,9 @@ class BLSTMCRF(BaseKerasModel):
                                          math.floor((1+epoch)/epochs_drop))
         return lrate
 
+    def plot_history(self, history):
+        plt.plot(history.losses)
+        plt.title('model losses')
+        plt.ylabel('Loss')
+        plt.xlabel('epoch')
+        plt.show()

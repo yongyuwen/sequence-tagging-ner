@@ -29,16 +29,16 @@ def main():
 
     model.summary()
     # train model
-    model.train(train, dev)
+    model.train(train, dev, show_history=True)
 
     # Save model
     model.save_weights('./saves/Word_BLSTM_2e.h5')
 
     # test predictions
-    words = "Obama was born in hawaii"
-    words = words.split(" ")
-    pred = model.predict_words(words)
-    print(pred)
+    # words = "Obama was born in hawaii"
+    # words = words.split(" ")
+    # pred = model.predict_words(words)
+    # print(pred)
 
 if __name__ == "__main__":
     main()

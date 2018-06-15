@@ -71,7 +71,7 @@ class BaseKerasModel(object):
 
         return (nbatches, data_generator())
 
-    def train(self, train, dev):
+    def train(self, train, dev, show_history=False):
         batch_size = self.config.batch_size
 
         nbatches_train, train_generator = self.batch_iter(train, batch_size)
@@ -79,16 +79,21 @@ class BaseKerasModel(object):
 
 
         _, f1_generator = self.batch_iter(dev, batch_size, return_lengths=True)
-        f1 = F1score(f1_generator, 2)
+        f1 = F1score(f1_generator, 2, self.run_evaluate)
 
         callbacks = self.gen_callbacks([f1])
 
-        self.model.fit_generator(generator=train_generator,
-                                 steps_per_epoch=2,
-                                 validation_data=dev_generator,
-                                 validation_steps=2,
-                                 epochs=2,
-                                 callbacks=callbacks) #, nbatches_train
+        history = self.model.fit_generator(generator=train_generator,
+                                           steps_per_epoch=2,
+                                           validation_data=dev_generator,
+                                           validation_steps=2,
+                                           epochs=2,
+                                           callbacks=callbacks) #, nbatches_train
+
+        if show_history:
+            print(history.history['f1'])
+            pass
+
 
     def predict_words(self, words_raw):
         words = [self.config.processing_word(w) for w in words_raw]
@@ -144,15 +149,10 @@ class BaseKerasModel(object):
 
                 label_true.extend(lab)
                 label_pred.extend(lab_pred)
-                #break
-            #break
-            #except StopIteration:
-                #break
 
-        #print(label_true)
+
         label_true = np.asarray(label_true)
         print("Truths: ", label_true)
-        #print(label_pred)
         label_pred = np.asarray(label_pred)
         print("Preds: ", label_pred)
 
@@ -169,6 +169,9 @@ class BaseKerasModel(object):
 
         weighted_score = f1_score(label_true, label_pred, average='weighted')
         print(' - weighted f1: {:04.2f}'.format(weighted_score * 100))
+
+        #print(classification_report(label_true, label_pred))
+        return (micro_score, macro_score, weighted_score)
 
     def get_loss(self):
         return self._loss
