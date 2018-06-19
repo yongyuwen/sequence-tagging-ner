@@ -18,7 +18,7 @@ def main():
 
     #model.summary()
     # Loading weights
-    #model.load_weights('./saves/Word_BLSTM_2e.h5')
+    model.load_weights('./saves/WEWWWWW.h5')
 
 
     # create datasets
@@ -29,7 +29,7 @@ def main():
 
     model.summary()
     # train model
-    model.train(train, dev, show_history=True)
+    model.train(train, dev)
 
     # Save model
     model.save_weights('./saves/Word_BLSTM_2e.h5')

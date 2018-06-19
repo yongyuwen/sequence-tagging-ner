@@ -122,11 +122,12 @@ def get_char_vocab(dataset):
         a set of all the characters in the dataset
 
     """
+    print("Building char vocab...")
     vocab_char = set()
     for words, _ in dataset:
         for word in words:
             vocab_char.update(word)
-
+    print("- done. {} tokens".format(len(vocab_char)))
     return vocab_char
 
 

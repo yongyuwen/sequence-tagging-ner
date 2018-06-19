@@ -29,13 +29,15 @@ class BLSTMCRF(BaseKerasModel):
         if self.config.embeddings is None:
             word_embeddings = Embedding(input_dim=self.config.nwords,
                                         output_dim=self.config.dim_word,
-                                        mask_zero=True)(input_words)
+                                        mask_zero=True,
+                                        name="word_embeddings")(input_words)
         else:
             word_embeddings = Embedding(input_dim=self.config.nwords,
                                         output_dim=self.config.dim_word,
                                         mask_zero=True,
                                         weights=[self.config.embeddings],
-                                        trainable=self.config.train_embeddings)(input_words)
+                                        trainable=self.config.train_embeddings,
+                                        name="word_embeddings")(input_words)
 
         # build character based word embedding
         if self.config.use_chars:
@@ -59,7 +61,7 @@ class BLSTMCRF(BaseKerasModel):
             word_embeddings = Concatenate(axis=-1)([word_embeddings, char_embeddings])
 
         word_embeddings = Dropout(self.config.dropout)(word_embeddings)
-        encoded_text = Bidirectional(LSTM(units=self.config.hidden_size_lstm, return_sequences=True))(word_embeddings)
+        encoded_text = Bidirectional(LSTM(units=self.config.hidden_size_lstm, return_sequences=True), name="bidirectional")(word_embeddings)
         encoded_text = Dropout(self.config.dropout)(encoded_text)
         #encoded_text = Dense(100, activation='tanh')(encoded_text)
 

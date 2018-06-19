@@ -117,12 +117,12 @@ class BaseKerasModel(object):
             #print(char_ids)
 
         one_hot_preds = self.model.predict_on_batch(inputs)
-        print("One hot preds: ", one_hot_preds)
+        #print("One hot preds: ", one_hot_preds)
         one_hot_preds = [a.flatten() for a in one_hot_preds.squeeze()] #Squeeze to remove unnecessary 1st dimension for batch size
-        print("One hot preds: ", one_hot_preds)
+        #print("One hot preds: ", one_hot_preds)
 
         pred_ids = np.argmax(one_hot_preds, axis=1)
-        print("Pred ids: ", pred_ids)
+        #print("Pred ids: ", pred_ids)
 
         preds = [self.idx_to_tag[idx] for idx in pred_ids]
 
@@ -152,9 +152,9 @@ class BaseKerasModel(object):
 
 
         label_true = np.asarray(label_true)
-        print("Truths: ", label_true)
+        #print("Truths: ", label_true)
         label_pred = np.asarray(label_pred)
-        print("Preds: ", label_pred)
+        #print("Preds: ", label_pred)
 
         acc = np.mean(accs)
 
