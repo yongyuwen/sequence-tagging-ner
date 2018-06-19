@@ -67,7 +67,7 @@ def main():
     embeddings = np.zeros([embedding_weights.shape[0]+len(vocab), embedding_weights.shape[1]])
     # Load old vectors
     for idx, vec in enumerate(embedding_weights):
-        embedding_weights[idx] = vec
+        embeddings[idx] = vec
     # Load new vectors
     pt = embedding_weights.shape[0]
     for idx, word in enumerate(vocab):
