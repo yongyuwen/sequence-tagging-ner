@@ -1,5 +1,3 @@
-Keras Implementation of Bi-LSTM-CRF from https://guillaumegenthial.github.io/sequence-tagging-with-tensorflow.html
-
 # Keras-BiLSTMCRF
 
 Keras Implementation of the BiLSTM-CRF model as described in https://guillaumegenthial.github.io/. 
