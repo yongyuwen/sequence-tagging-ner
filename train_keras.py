@@ -18,11 +18,11 @@ def main():
 
     #model.summary()
     # Loading weights
-    model.load_weights('./saves/WEWWWWW.h5')
+    #model.load_weights('./saves/test20.h5')
 
 
     # create datasets
-    dev = CoNLLDataset(config.filename_dev, config.processing_word,
+    dev = CoNLLDataset(config.filename_train, config.processing_word, #filename_dev
                          config.processing_tag, config.max_iter)
     train = CoNLLDataset(config.filename_train, config.processing_word,
                          config.processing_tag, config.max_iter)
@@ -32,7 +32,7 @@ def main():
     model.train(train, dev)
 
     # Save model
-    model.save_weights('./saves/Word_BLSTM_2e.h5')
+    model.save_weights('./saves/test20.h5')
 
     # test predictions
     # words = "Obama was born in hawaii"

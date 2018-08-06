@@ -79,15 +79,15 @@ class BaseKerasModel(object):
 
 
         _, f1_generator = self.batch_iter(dev, batch_size, return_lengths=True)
-        f1 = F1score(f1_generator, 2, self.run_evaluate)
+        f1 = F1score(f1_generator, nbatches_dev, self.run_evaluate)
 
         callbacks = self.gen_callbacks([f1])
 
         history = self.model.fit_generator(generator=train_generator,
-                                           steps_per_epoch=2,
+                                           steps_per_epoch=nbatches_train,
                                            validation_data=dev_generator,
-                                           validation_steps=2,
-                                           epochs=2,
+                                           validation_steps=nbatches_dev,
+                                           epochs=5,
                                            callbacks=callbacks) #, nbatches_train
 
         if show_history:

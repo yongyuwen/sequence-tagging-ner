@@ -13,7 +13,7 @@ def main():
     model.build()
     model.compile(optimizer=model.get_optimizer(), loss=model.get_loss()) #, metrics=['acc']
 
-    model.load_weights('./saves/blstmCrf_15.h5')
+    model.load_weights('./saves/test20.h5') #./saves/blstmCrf_15.h5
 
     test = CoNLLDataset(config.filename_test, config.processing_word,
                         config.processing_tag, config.max_iter)
@@ -23,9 +23,10 @@ def main():
 
     model.run_evaluate(test_generator, nbatches_test)
     # test predictions
-    words = "James is a Singaporean"
+    words = "Fa Mulan is from Dynasty Trading Limited"
     words = words.split(" ")
     pred = model.predict_words(words)
+    print(words)
     print(pred)
 
 if __name__ == "__main__":

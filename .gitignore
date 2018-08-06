@@ -11,4 +11,8 @@
 
 /saves/
 /.idea/
-
+evaluate.py
+train.py
+ner_model.py
+base_model.py
+test.py
